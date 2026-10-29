@@ -232,7 +232,7 @@ function renderSum(){
   document.querySelectorAll(".steps li").forEach((li,i)=>li.className=i<st?"done":i===st?"on":"");
   $("#form").classList.toggle("dim",!c);
   if(!c){
-    el.innerHTML=ci?"Check-in: <b>"+fdt(ci)+"</b>. Sekarang ketik tarikh <b>check-out</b>.<br>"+clr:"Ketik tarikh <b>check-in</b> di calendar.";
+    el.innerHTML=ci?"Check-in: <b>"+fdt(ci)+"</b>. Sekarang pilih tarikh <b>check-out</b>.<br>"+clr:"Pilih tarikh <b>check-in</b> di calendar.";
     $("#depinfo").textContent="Pilih tarikh dahulu untuk lihat jumlah deposit.";return;
   }
   el.innerHTML="<b>"+fdt(ci)+"</b> hingga <b>"+fdt(co)+"</b><br>"+c.n+" malam, jumlah <b>"+rm(c.t)+"</b><br><button type=\"button\" class=\"link\" id=\"go\">Teruskan ke borang</button>"+clr;
