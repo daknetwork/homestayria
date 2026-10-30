@@ -136,7 +136,8 @@ a.btn{text-align:center;text-decoration:none}
   <form class="card" id="form" novalidate>
     <h2>Maklumat anda</h2>
     <label for="nm">Nama penuh</label><input id="nm" required autocomplete="name">
-    <label for="ph">No. WhatsApp</label><input id="ph" type="tel" placeholder="012-3456789" required autocomplete="tel">
+    <label for="ph">No. WhatsApp</label><input id="ph" type="tel" inputmode="numeric" placeholder="012-3456789" maxlength="16" required autocomplete="tel">
+    <div class="help">Nombor Malaysia sahaja, contohnya 012-3456789 atau 011-12345678.</div>
     <label for="gu">Bilangan tetamu</label><input id="gu" type="number" min="1" max="8" value="2">
     <label for="nt">Nota (pilihan)</label><textarea id="nt" rows="2"></textarea>
     <h2 style="margin-top:22px">Bayar deposit</h2>
