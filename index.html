@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Homestay Ria – Tempahan</title>
+<title>Homestay Contoh – Tempahan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -117,8 +117,7 @@ a.btn{text-align:center;text-decoration:none}
 <body>
 <main>
 <header class="hero" id="hero">
-  <a href="#admin" class="adm">Admin</a>
-  <h1 id="hname">Homestay Ria</h1>
+  <h1 id="hname">Homestay Contoh</h1>
   <p id="tagline"></p>
   <div class="facts" id="facts"></div>
 </header>
@@ -162,29 +161,14 @@ a.btn{text-align:center;text-decoration:none}
   </div>
 </section>
 
-<section id="admin" class="hide">
-  <p><a href="#" style="color:var(--mut)">Kembali ke laman tempahan</a></p>
-  <form id="login" class="card" novalidate>
-    <h2>Log masuk admin</h2>
-    <label for="em">Email</label><input id="em" type="email" autocomplete="username">
-    <label for="pw">Kata laluan</label><input id="pw" type="password" autocomplete="current-password">
-    <div class="err" id="lerr" role="alert"></div>
-    <button class="btn" type="submit">Log masuk</button>
-  </form>
-  <div id="panel" class="hide">
-    <div class="row" style="margin-bottom:12px"><b>Tempahan <span id="cnt"></span></b><button class="ghost" id="out">Log keluar</button></div>
-    <div class="chips" id="chips"><button data-f="pending" class="on">Menunggu</button><button data-f="confirmed">Disahkan</button><button data-f="all">Semua</button></div>
-    <div id="list"></div>
-  </div>
-</section>
 </main>
 <div id="toast" role="status"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 /* ====== TETAPAN: ganti nilai di bawah ====== */
-const CFG={name:"Homestay Ria",photo:"",desc:"Rumah 3 bilik di Melaka, muat sehingga 8 orang.",wa:"60123456789",
+const CFG={name:"Homestay Contoh",photo:"",desc:"Rumah 3 bilik di Melaka, muat sehingga 8 orang.",wa:"60123456789",
   wd:250,we:350,dep:0.3,
-  url:"https://rzsmxgnmmqctvrweyplu.supabase.co",key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c214Z25tbXFjdHZyd2V5cGx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMTY2ODksImV4cCI6MjEwODc5MjY4OX0.H3YI0Alyfd0REMlahjJOBolG-ANdHmM3Dqt6An1Lg08"};
+  url:"PASTE_SUPABASE_URL",key:"PASTE_SUPABASE_ANON_KEY"};
 /* ========================================== */
 const ready=!CFG.url.startsWith("PASTE")&&window.supabase;
 const db=ready?supabase.createClient(CFG.url,CFG.key):null;
@@ -232,7 +216,7 @@ function renderSum(){
   document.querySelectorAll(".steps li").forEach((li,i)=>li.className=i<st?"done":i===st?"on":"");
   $("#form").classList.toggle("dim",!c);
   if(!c){
-    el.innerHTML=ci?"Check-in: <b>"+fdt(ci)+"</b>. Sekarang pilih tarikh <b>check-out</b>.<br>"+clr:"Pilih tarikh <b>check-in</b> di calendar.";
+    el.innerHTML=ci?"Check-in: <b>"+fdt(ci)+"</b>. Sekarang ketik tarikh <b>check-out</b>.<br>"+clr:"Ketik tarikh <b>check-in</b> di calendar.";
     $("#depinfo").textContent="Pilih tarikh dahulu untuk lihat jumlah deposit.";return;
   }
   el.innerHTML="<b>"+fdt(ci)+"</b> hingga <b>"+fdt(co)+"</b><br>"+c.n+" malam, jumlah <b>"+rm(c.t)+"</b><br><button type=\"button\" class=\"link\" id=\"go\">Teruskan ke borang</button>"+clr;
@@ -286,78 +270,19 @@ $("#form").onsubmit=async e=>{
   }finally{btn.disabled=false;btn.textContent="Hantar tempahan"}
 };
 
-/* ---- Admin ---- */
-function wa(b){
-  let p=b.phone.replace(/\D/g,"");if(p.startsWith("0"))p="6"+p;
-  const t="Salam "+b.name+", terima kasih kerana menempah pada "+fdt(b.ci)+" hingga "+fdt(b.co)+". Deposit: "+rm(b.deposit)+". Maklumat bayaran: ";
-  return "https://wa.me/"+p+"?text="+encodeURIComponent(t);
-}
-async function showAdmin(){
-  if(!db)return;
-  const{data}=await db.auth.getSession(),s=data.session;
-  $("#login").classList.toggle("hide",!!s);$("#panel").classList.toggle("hide",!s);
-  if(s)loadAdmin();
-}
-async function loadAdmin(){
-  const{data,error}=await db.from("bookings").select("*").order("created_at",{ascending:false});
-  if(error){$("#list").textContent="Gagal muat tempahan: "+error.message;return}
-  rows=data||[];urls={};
-  const paths=rows.map(r=>r.receipt_path).filter(Boolean);
-  if(paths.length){const{data:u}=await db.storage.from("receipts").createSignedUrls(paths,3600);(u||[]).forEach(x=>{if(x.signedUrl)urls[x.path]=x.signedUrl})}
-  renderAdmin();
-}
-function renderAdmin(){
-  const np=rows.filter(b=>b.status==="pending").length;let flt=window._flt||"pending";
-  document.querySelectorAll("#chips button").forEach(x=>x.classList.toggle("on",x.dataset.f===flt));
-  $("#cnt").textContent=np?"("+np+")":"";
-  const vis=rows.filter(b=>flt==="all"||b.status===flt);
-  $("#list").innerHTML=vis.length?vis.map(b=>{
-    const u=urls[b.receipt_path],pdf=(b.receipt_path||"").endsWith(".pdf");
-    return '<div class="card bk"><div class="row"><b>'+esc(b.name)+'</b><span class="tag '+b.status+'">'+L[b.status]+"</span></div>"+
-    '<div class="mut">'+fdt(b.ci)+" hingga "+fdt(b.co)+", "+nights(b.ci,b.co).length+" malam, "+esc(b.guests)+" tetamu</div>"+
-    "<div>"+esc(b.phone)+"</div><div>Jumlah "+rm(b.total)+", deposit "+rm(b.deposit)+"</div>"+
-    (b.note?'<div class="mut">Nota: '+esc(b.note)+"</div>":"")+
-    (u?(pdf?'<div><a href="'+u+'" target="_blank" rel="noopener">Buka resit (PDF)</a></div>':'<img class="rcpt" src="'+u+'" alt="Resit bayaran">'):'<div class="mut">'+(b.receipt_path?"Resit tidak ditemui":"Belum ada resit. Hantar maklumat bayaran melalui WhatsApp.")+"</div>")+
-    '<div class="acts">'+(b.status!=="confirmed"?'<button class="ok" data-a="confirmed" data-id="'+b.id+'">Sahkan</button>':"")+
-    (b.status!=="rejected"?'<button data-a="rejected" data-id="'+b.id+'">Tolak</button>':"")+
-    '<a href="'+wa(b)+'" target="_blank" rel="noopener">WhatsApp tetamu</a><button data-a="del" data-id="'+b.id+'">Padam</button></div></div>'
-  }).join(""):'<div class="card mut">Tiada tempahan dalam senarai ini.</div>';
-}
-$("#list").onclick=async e=>{
-  const im=e.target.closest(".rcpt");if(im)return im.classList.toggle("big");
-  const b=e.target.closest("button[data-a]");if(!b)return;
-  const id=b.dataset.id,row=rows.find(r=>r.id===id);let r;
-  if(b.dataset.a==="del"){
-    if(!confirm("Padam tempahan ini?"))return;
-    if(row&&row.receipt_path)await db.storage.from("receipts").remove([row.receipt_path]);
-    r=await db.from("bookings").delete().eq("id",id);
-  }else{if(b.dataset.a==="rejected"&&!confirm("Tolak tempahan ini? Tarikh akan dibuka semula."))return;r=await db.from("bookings").update({status:b.dataset.a}).eq("id",id)}
-  if(r.error)return toast(r.error.code==="23P01"?"Tarikh bertindih dengan tempahan lain.":"Gagal kemas kini.");
-  await loadAdmin();await refresh();
-};
-$("#login").onsubmit=async e=>{
-  e.preventDefault();$("#lerr").textContent="";
-  if(!db)return $("#lerr").textContent="Belum disambung ke Supabase.";
-  const{error}=await db.auth.signInWithPassword({email:$("#em").value.trim(),password:$("#pw").value});
-  if(error)return $("#lerr").textContent="Email atau kata laluan salah.";
-  $("#pw").value="";showAdmin();
-};
-$("#out").onclick=async()=>{await db.auth.signOut();rows=[];showAdmin()};
-
-function show(v){["guest","done","admin"].forEach(k=>$("#"+k).classList.toggle("hide",k!==v));window.scrollTo(0,0)}
-function route(){if(location.hash==="#admin"){show("admin");showAdmin()}else{show("guest");refresh()}}
+function show(v){["guest","done"].forEach(k=>$("#"+k).classList.toggle("hide",k!==v));window.scrollTo(0,0)}
+function route(){show("guest");refresh()}
 function showDone(s){
   $("#dsum").innerHTML="<b>"+esc(s.name)+"</b>, tempahan anda untuk <b>"+fdt(s.ci)+"</b> hingga <b>"+fdt(s.co)+"</b> ("+s.n+" malam) telah dihantar. Deposit: "+rm(s.dep)+".";
   $("#dwa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent("Salam, saya "+s.name+". Saya baru hantar tempahan "+fdt(s.ci)+" hingga "+fdt(s.co)+" ("+s.n+" malam). Boleh bagi maklumat untuk bayaran deposit? Terima kasih!");
   show("done");
 }
 $("#again").onclick=()=>show("guest");
-$("#chips").onclick=e=>{const b=e.target.closest("button[data-f]");if(!b)return;window._flt=b.dataset.f;renderAdmin()};
 if(CFG.photo)$("#hero").style.backgroundImage="linear-gradient(180deg,rgba(8,32,36,.4),rgba(8,32,36,.82)),url('"+CFG.photo+"')";
 document.title=CFG.name+" - Tempahan";$("#hname").textContent=CFG.name;$("#tagline").textContent=CFG.desc;
 $("#facts").innerHTML=["Malam biasa "+rm(CFG.wd),"Jumaat dan Sabtu "+rm(CFG.we),"Deposit "+Math.round(CFG.dep*100)+"%"].map(x=>"<span>"+esc(x)+"</span>").join("");
 if(!db)$("#cmsg").textContent="Mod demo: belum disambung ke Supabase (isi URL dan key dalam tetapan).";
-renderCal();renderSum();route();window.onhashchange=route;
+renderCal();renderSum();route();
 </script>
 </body>
 </html>
