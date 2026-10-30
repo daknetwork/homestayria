@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Homestay Ria – Tempahan</title>
+<title>Homestay Contoh – Tempahan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -117,7 +117,7 @@ a.btn{text-align:center;text-decoration:none}
 <body>
 <main>
 <header class="hero" id="hero">
-  <h1 id="hname">Homestay Ria</h1>
+  <h1 id="hname">Homestay Contoh</h1>
   <p id="tagline"></p>
   <div class="facts" id="facts"></div>
 </header>
@@ -166,14 +166,16 @@ a.btn{text-align:center;text-decoration:none}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 /* ====== TETAPAN: ganti nilai di bawah ====== */
-const CFG={name:"Homestay Ria",photo:"",desc:"Rumah 3 bilik di Melaka, muat sehingga 8 orang.",wa:"60123456789",
+const CFG={name:"Homestay Contoh",photo:"",desc:"Rumah 3 bilik di Melaka, muat sehingga 8 orang.",wa:"60123456789",
   wd:250,we:350,dep:0.3,
   url:"https://rzsmxgnmmqctvrweyplu.supabase.co
 anon
 ",key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c214Z25tbXFjdHZyd2V5cGx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMTY2ODksImV4cCI6MjEwODc5MjY4OX0.H3YI0Alyfd0REMlahjJOBolG-ANdHmM3Dqt6An1Lg08"};
 /* ========================================== */
-const ready=!CFG.url.startsWith("PASTE")&&window.supabase;
-const db=ready?supabase.createClient(CFG.url,CFG.key):null;
+let db=null,cfgErr="";
+if(CFG.url.startsWith("PASTE")||CFG.key.startsWith("PASTE"))cfgErr="Mod demo: belum disambung ke Supabase (isi url dan key dalam tetapan).";
+else if(!window.supabase)cfgErr="Pustaka Supabase gagal dimuat. Semak sambungan internet.";
+else try{db=supabase.createClient(CFG.url.trim(),CFG.key.trim())}catch(e){console.error(e);cfgErr="Tetapan Supabase tidak sah. URL mesti bermula dengan https:// dan key tidak boleh kosong."}
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,"0");
 const fmt=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
@@ -283,7 +285,7 @@ $("#again").onclick=()=>show("guest");
 if(CFG.photo)$("#hero").style.backgroundImage="linear-gradient(180deg,rgba(8,32,36,.4),rgba(8,32,36,.82)),url('"+CFG.photo+"')";
 document.title=CFG.name+" - Tempahan";$("#hname").textContent=CFG.name;$("#tagline").textContent=CFG.desc;
 $("#facts").innerHTML=["Malam biasa "+rm(CFG.wd),"Jumaat dan Sabtu "+rm(CFG.we),"Deposit "+Math.round(CFG.dep*100)+"%"].map(x=>"<span>"+esc(x)+"</span>").join("");
-if(!db)$("#cmsg").textContent="Mod demo: belum disambung ke Supabase (isi URL dan key dalam tetapan).";
+if(!db)$("#cmsg").textContent=cfgErr;
 renderCal();renderSum();route();
 </script>
 </body>
