@@ -168,7 +168,9 @@ a.btn{text-align:center;text-decoration:none}
 /* ====== TETAPAN: ganti nilai di bawah ====== */
 const CFG={name:"Homestay Contoh",photo:"",desc:"Rumah 3 bilik di Melaka, muat sehingga 8 orang.",wa:"60123456789",
   wd:250,we:350,dep:0.3,
-  url:"PASTE_SUPABASE_URL",key:"PASTE_SUPABASE_ANON_KEY"};
+  url:"https://rzsmxgnmmqctvrweyplu.supabase.co
+anon
+",key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c214Z25tbXFjdHZyd2V5cGx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMTY2ODksImV4cCI6MjEwODc5MjY4OX0.H3YI0Alyfd0REMlahjJOBolG-ANdHmM3Dqt6An1Lg08"};
 /* ========================================== */
 const ready=!CFG.url.startsWith("PASTE")&&window.supabase;
 const db=ready?supabase.createClient(CFG.url,CFG.key):null;
